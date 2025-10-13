@@ -1,6 +1,9 @@
 body {
     font-family: 'Roboto Slab', serif;
-    background-color: #111;
+    background-image:url('peugeot_bg.png');
+ background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: 100% 100%;
     color: #eee;
     margin: 0;
     line-height: 1.7;
@@ -23,6 +26,8 @@ main {
     margin: 2rem auto;
     direction: rtl; /* odwrócony układ */
     text-align: justify;
+	background-color:#111;
+	opacity:0.8;
 }
 
 
