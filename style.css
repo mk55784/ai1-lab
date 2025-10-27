@@ -1,0 +1,134 @@
+
+html,body{
+  height:100%;
+  margin:0;
+  background-image: url("peugeot_bg.png");
+  background-repeat: no-repeat;
+  background-size:cover;
+    background-attachment: fixed;
+}
+
+.wrap{
+  max-width:760px;
+  margin:80px auto;
+  padding:28px;
+  box-sizing:border-box;
+  background:linear-gradient(#d4d4d4, #9e9e9e);
+  border:8px solid var(--inner-accent);
+  box-shadow: 0 8px 0 rgba(0,0,0,0.25);
+  position:relative;
+}
+.wrap::before{
+  content:"";
+  position:absolute;
+  left:-18px; right:-18px; top:-18px; bottom:-18px;
+  border:6px solid var(--accent);
+  z-index:-1;
+  box-shadow: 14px 14px 18px rgba(0,0,0,0.14);
+  border-radius:1px;
+}
+
+.search{
+  display:block;
+  width:100%;
+  box-sizing:border-box;
+  padding:10px 12px;
+  border:2px solid #3b3b3b;
+  background: #e3e3e3;
+  font-size:18px;
+  outline:none;
+}
+
+.tasks{
+  margin-top:24px;
+  list-style:none;
+  padding:0;
+}
+.task{
+  display:grid;
+  grid-template-columns: 30px 1fr 160px 90px;
+  align-items:center;
+  gap:12px;
+  padding:14px 10px;
+  border-radius:4px;
+  margin-bottom:10px;
+  background: transparent;
+}
+.task input[type="checkbox"]{
+  width:18px;
+  height:18px;
+  margin-left:6px;
+}
+.title{
+  font-size:20px;
+  padding-left:6px;
+  cursor:text;
+  user-select:text;
+}
+.title.done{
+  text-decoration:line-through;
+  color:var(--muted);
+  opacity:0.7;
+}
+.date{
+  text-align:center;
+  font-size:18px;
+  color:var(--text);
+  cursor:pointer;
+  user-select:none;
+}
+.small-btn{
+  border:2px solid var(--button-border);
+  background:var(--button-bg);
+  padding:6px 12px;
+  border-radius:3px;
+  cursor:pointer;
+  font-size:18px;
+  box-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+}
+.small-btn:active{ transform:translateY(1px); }
+
+.add-row{
+  display:flex;
+  gap:12px;
+  margin-top:18px;
+  background:#e3e3e3;
+  align-items:center;
+}
+.new-title{
+  flex:1;
+  padding:10px;
+  border:2px solid #3b3b3b;
+  background:#e3e3e3;
+  font-size:18px;
+}
+.new-date{
+  width:180px;
+  padding:10px;
+  border:2px solid #3b3b3b;
+  background:#e3e3e3;
+  font-size:16px;
+}
+.label-muted{
+  color:var(--muted);
+  font-size:16px;
+  margin-right:8px;
+}
+
+.edit-input{
+  font-size:18px;
+  padding:6px 8px;
+  border:2px solid #3b3b3b;
+  background:#e3e3e3;
+  width:100%;
+  box-sizing:border-box;
+}
+mark{
+	background-color:yellow;
+	color:black;
+	
+}
+.mark{background-color:yellow;
+	color:black;}
+
+
