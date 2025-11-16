@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <title>MK55784-LABC</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/esri-leaflet@3.0.8/dist/esri-leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-image/leaflet-image.js"></script>
+
+  <style>
+     body {
+      font-family: Arial, sans-serif;
+      background-image: url("peugeot_bg.png");
+      background-repeat: no-repeat;
+      background-size:cover;
+      background-attachment: fixed;
+      margin:0;
+      text-align:center;
+    }
+    #controls { margin:8px; }
+    #map { width: 600px; height: 400px; margin: 8px auto; border:2px solid #333; }
+    #puzzleArea { display:flex; justify-content:center; gap:16px; flex-wrap:wrap; }
+    canvas { background:#cbcbcb; border:3px solid #333; display:block; }
+    #srcCanvas, #dstCanvas { width:400px; height:400px; }
+    .canvasWrap { display:flex; flex-direction:column; align-items:center; }
+    button { padding:8px 12px; font-size:16px; margin-right:6px; }
+  </style>
+</head>
+<body>
+
+<h1>MK55784-LABC</h1>
+
+<div id="controls">
+  <button id="getLocation">Moja lokalizacja</button>
+  <button id="saveButton">Pobierz mapę</button>
+  <span id="info"></span>
+</div>
+
+<div id="map"></div>
+
+<div id="puzzleArea">
+  <div class="canvasWrap">
+    <div>rozsypane</div>
+    <canvas id="srcCanvas" width="400" height="400"></canvas>
+  </div>
+
+  <div class="canvasWrap">
+    <div>ulozone</div>
+    <canvas id="dstCanvas" width="400" height="400"></canvas>
+  </div>
+</div>
+
+<script>
+
+const map = L.map('map').setView([53.447685, 14.491989], 16);
+L.esri.basemapLayer('Imagery').addTo(map);
+let marker = L.marker([53.447685, 14.491989]).addTo(map);
+
+const getLocationBtn = document.getElementById('getLocation');
+const saveButton = document.getElementById('saveButton');
+const info = document.getElementById('info');
+const srcCanvas = document.getElementById('srcCanvas');
+const dstCanvas = document.getElementById('dstCanvas');
+const sctx = srcCanvas.getContext('2d');
+const dctx = dstCanvas.getContext('2d');
+
+
+const GRID = 4;
+const SIZE = 400;
+const PIECE = SIZE / GRID;
+
+let pieces = [];
+let order = [];
+let placed = Array(GRID * GRID).fill(null);
+let naMiejscuOk = 0;
+let selectedPiece = null;
+
+
+getLocationBtn.addEventListener('click', () => {
+  if (!navigator.geolocation) return alert('Brak geolokalizacji.');
+  navigator.geolocation.getCurrentPosition(pos => {
+    const lat = pos.coords.latitude, lon = pos.coords.longitude;
+    map.setView([lat, lon], 17);
+    marker.setLatLng([lat, lon]);
+	info.textContent = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+  });
+});
+
+
+saveButton.addEventListener('click', () => {
+  leafletImage(map, (err, img) => {
+    if (err) return alert('Blad mapy.');
+    sctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, 400, 400);
+    createPieces();
+    drawScrambled();
+  });
+});
+
+
+function createPieces() {
+  pieces = [];
+  let tmp = document.createElement('canvas');
+  tmp.width = PIECE;
+  tmp.height = PIECE;
+  let ctx = tmp.getContext('2d');
+
+  for (let y = 0; y < GRID; y++) {
+    for (let x = 0; x < GRID; x++) {
+      ctx.clearRect(0,0,PIECE,PIECE);
+      ctx.drawImage(srcCanvas, x*PIECE, y*PIECE, PIECE, PIECE, 0,0,PIECE,PIECE);
+      pieces.push({
+        originalIndex: y * GRID + x,
+        url: tmp.toDataURL()
+      });
+    }
+  }
+  order = pieces.map((_,i)=>i).sort(()=>Math.random() - 0.5);
+}
+
+
+function drawScrambled() {
+  sctx.clearRect(0,0,400,400);
+  order.forEach((idx, pos)=> {
+    let img = new Image();
+    img.onload = () => {
+      let x = (pos % GRID) * PIECE;
+      let y = Math.floor(pos / GRID) * PIECE;
+      sctx.drawImage(img, x, y, PIECE, PIECE);
+    };
+    img.src = pieces[idx].url;
+  });
+}
+
+
+srcCanvas.addEventListener('mousedown', e => {
+  const rect = srcCanvas.getBoundingClientRect();
+  const x = Math.floor((e.clientX - rect.left) / PIECE);
+  const y = Math.floor((e.clientY - rect.top) / PIECE);
+  selectedPiece = y * GRID + x;
+});
+
+dstCanvas.addEventListener('mouseup', e => {
+  if (selectedPiece === null) return;
+
+  const rect = dstCanvas.getBoundingClientRect();
+  const x = Math.floor((e.clientX - rect.left) / PIECE);
+  const y = Math.floor((e.clientY - rect.top) / PIECE);
+  const destIndex = y * GRID + x;
+
+  if (placed[destIndex] !== null) return;
+
+  let pieceIndex = order[selectedPiece];
+  let img = new Image();
+
+  img.onload = () => {
+    dctx.drawImage(img, x * PIECE, y * PIECE, PIECE, PIECE);
+
+    placed[destIndex] = pieceIndex;
+
+    if (pieceIndex === destIndex) {
+      naMiejscuOk++;
+      console.log(`ok puz ${pieceIndex} na ${destIndex}`);
+    } else {
+      console.log(`zly puz. Puzz ${pieceIndex} na ${destIndex}`);
+    }
+
+    checkWin();
+  };
+
+  img.src = pieces[pieceIndex].url;
+
+  let sx = (selectedPiece % GRID) * PIECE;
+  let sy = Math.floor(selectedPiece / GRID) * PIECE;
+  sctx.clearRect(sx, sy, PIECE, PIECE);
+
+  selectedPiece = null;
+});
+
+
+function checkWin() {
+  console.log("Aktualne poprawne elementy:", naMiejscuOk);
+
+  if (naMiejscuOk === GRID * GRID) {
+    console.log("ulozone ok");
+    showWin();
+  }
+}
+
+
+function showWin() {
+  if (Notification.permission === 'granted') {
+    new Notification('Brawo!', { body: 'Mapa poprawnie ułożona!' });
+  } else {
+    alert('Mapa ułożona poprawnie!');
+  }
+}
+
+if (Notification.permission !== 'granted')
+  Notification.requestPermission();
+</script>
+</body>
+</html>
