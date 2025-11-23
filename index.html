@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Pogodynka – MK55784</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-image: url("tlo.jpg");
+        background-size: cover;          
+        background-repeat: no-repeat;
+        background-position: center;
+        background-attachment: fixed;  
+        margin: 0;
+        padding: 20px;
+        text-align: center;
+    }
+
+    #container {
+        max-width: 750px;
+        margin: 0 auto;
+        background: rgba(255, 245, 220, 0.67);
+        border-radius: 14px;
+        padding: 22px 26px;
+        box-shadow: 0 0 25px rgba(0,0,0,0.28);
+        backdrop-filter: blur(3px); 
+    }
+
+    input {
+        padding: 10px;
+        width: 60%;
+        font-size: 16px;
+        border-radius: 6px;
+        border: 1px solid #aaa;
+    }
+
+    button {
+        padding: 10px 16px;
+        font-size: 16px;
+        cursor: pointer;
+        background: #f0e0bd;
+        border: 1px solid #b9a98a;
+        border-radius: 6px;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+
+    button:hover {
+        background: #f7ecd2;
+        transform: scale(1.03);
+    }
+
+    #currentWeather, #forecast {
+        margin-top: 20px;
+        text-align: left;
+    }
+
+    .forecastBox {
+        padding: 10px;
+        border-bottom: 1px solid #c8c8c8;
+    }
+
+    .forecastBox img {
+        image-rendering: auto;
+    }
+
+    .temp {
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+<div id="container">
+    <h1>Pogodynka – MK55784</h1>
+
+    <input type="text" id="cityInput" placeholder="Wpisz miasto,kraj np. Szczecin,PL">
+    <button id="btnWeather">Pogoda</button>
+
+    <div id="currentWeather"></div>
+    <div id="forecast"></div>
+</div>
+
+<script src="pogodynka.js"></script>
+
+</body>
+</html>
